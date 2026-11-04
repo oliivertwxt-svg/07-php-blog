@@ -19,6 +19,8 @@ PHP 8 and MySQL blog CMS for `http://localhost/swd/07-php-blog/`.
 
 Set `APP_BASE_URL` if the project is mounted at a different URL path. The app expects MySQL with InnoDB and FULLTEXT support.
 
+The public site uses clean `/post/{slug}` and `/category/{slug}` URLs. Apache's `mod_rewrite` must be enabled and `.htaccess` overrides allowed for these routes.
+
 ## Admin content and cover uploads
 
 The admin area supports category and post CRUD. Post slugs are generated from titles and made unique with numeric suffixes. Cover uploads are limited to 2 MB and JPEG, PNG, and WebP.

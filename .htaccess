@@ -1,0 +1,5 @@
+RewriteEngine On
+RewriteBase /swd/07-php-blog/
+
+RewriteRule ^post/([a-zA-Z0-9-]+)/?$ post.php?slug=$1 [L,QSA]
+RewriteRule ^category/([a-zA-Z0-9-]+)/?$ category.php?slug=$1 [L,QSA]

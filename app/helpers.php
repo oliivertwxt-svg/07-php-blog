@@ -130,6 +130,38 @@ function format_date(string $date): string
     return date('M j, Y', strtotime($date));
 }
 
+function post_body_html(string $body): string
+{
+    $escapedBody = h(str_replace(["\r\n", "\r"], "\n", trim($body)));
+    $paragraphs = preg_split('/\n{2,}/', $escapedBody) ?: [];
+    $html = '';
+    foreach ($paragraphs as $paragraph) {
+        $paragraph = trim($paragraph);
+        if ($paragraph !== '') {
+            $html .= '<p>' . nl2br($paragraph, false) . '</p>';
+        }
+    }
+    return $html;
+}
+
+function public_post_card(array $post): void
+{
+    echo '<article class="post-card">';
+    if (!empty($post['cover_image'])) {
+        echo '<a class="post-card-cover" href="' . h(url('post/' . rawurlencode($post['slug']))) . '"><img class="cover" src="' . h(url('uploads/' . rawurlencode($post['cover_image']))) . '" alt=""></a>';
+    }
+    echo '<div class="meta">';
+    if (!empty($post['category_name'])) {
+        echo '<a href="' . h(url('category/' . rawurlencode($post['category_slug']))) . '">' . h($post['category_name']) . '</a>';
+    } else {
+        echo 'Uncategorized';
+    }
+    echo ' · ' . h($post['author_name']) . ' · ' . h(format_date($post['published_at'] ?: $post['created_at'])) . '</div>';
+    echo '<h2><a href="' . h(url('post/' . rawurlencode($post['slug']))) . '">' . h($post['title']) . '</a></h2>';
+    $excerpt = $post['excerpt'] !== '' ? $post['excerpt'] : mb_strimwidth(strip_tags($post['body']), 0, 240, '…');
+    echo '<p>' . h($excerpt) . '</p></article>';
+}
+
 function store_cover_image(array $file): ?string
 {
     $error = $file['error'] ?? UPLOAD_ERR_NO_FILE;
