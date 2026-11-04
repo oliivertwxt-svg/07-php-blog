@@ -6,7 +6,7 @@ require_admin();
 $categories = db()->query(
     'SELECT c.id, c.name, c.slug, COUNT(p.id) AS post_count
      FROM categories c LEFT JOIN posts p ON p.category_id = c.id
-     GROUP BY c.id ORDER BY c.name'
+     GROUP BY c.id, c.name, c.slug ORDER BY c.name'
 )->fetchAll();
 $message = flash('success');
 admin_header('Categories', 'categories');

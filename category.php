@@ -13,7 +13,7 @@ if (!$category) {
 $posts = [];
 if ($category) {
     $query = db()->prepare(
-        "SELECT p.title, p.slug, p.body, p.published_at, a.name AS author_name
+        "SELECT p.title, p.slug, p.excerpt, p.body, p.published_at, a.name AS author_name
          FROM posts p JOIN admins a ON a.id = p.author_id
          WHERE p.category_id = ? AND p.status = 'published' AND (p.published_at IS NULL OR p.published_at <= NOW())
          ORDER BY p.published_at DESC, p.created_at DESC"
@@ -32,7 +32,8 @@ if (!$category) {
     } else {
         echo '<div class="post-list">';
         foreach ($posts as $post) {
-            echo '<article class="post-card"><div class="meta">' . h($post['author_name']) . ' · ' . h(format_date($post['published_at'] ?: date('Y-m-d'))) . '</div><h2><a href="' . h(url('post.php?slug=' . rawurlencode($post['slug']))) . '">' . h($post['title']) . '</a></h2><p>' . h(mb_strimwidth(strip_tags($post['body']), 0, 240, '…')) . '</p></article>';
+            $excerpt = $post['excerpt'] !== '' ? $post['excerpt'] : mb_strimwidth(strip_tags($post['body']), 0, 240, '…');
+            echo '<article class="post-card"><div class="meta">' . h($post['author_name']) . ' · ' . h(format_date($post['published_at'] ?: date('Y-m-d'))) . '</div><h2><a href="' . h(url('post.php?slug=' . rawurlencode($post['slug']))) . '">' . h($post['title']) . '</a></h2><p>' . h($excerpt) . '</p></article>';
         }
         echo '</div>';
     }

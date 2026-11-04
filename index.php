@@ -7,7 +7,7 @@ $page = max(1, (int) ($_GET['page'] ?? 1));
 $perPage = 8;
 $count = (int) db()->query("SELECT COUNT(*) FROM posts WHERE status = 'published' AND (published_at IS NULL OR published_at <= NOW())")->fetchColumn();
 $statement = db()->prepare(
-    "SELECT p.id, p.title, p.slug, p.body, p.cover_image, p.published_at, c.name AS category_name, c.slug AS category_slug, a.name AS author_name
+    "SELECT p.id, p.title, p.slug, p.excerpt, p.body, p.cover_image, p.published_at, c.name AS category_name, c.slug AS category_slug, a.name AS author_name
      FROM posts p LEFT JOIN categories c ON c.id = p.category_id JOIN admins a ON a.id = p.author_id
      WHERE p.status = 'published' AND (p.published_at IS NULL OR p.published_at <= NOW())
      ORDER BY p.published_at DESC, p.created_at DESC LIMIT :limit OFFSET :offset"
@@ -31,7 +31,8 @@ if (!$posts) {
         $categoryLabel = $post['category_name'] ? '<a href="' . h(url('category.php?slug=' . rawurlencode($post['category_slug']))) . '">' . h($post['category_name']) . '</a>' : 'Uncategorized';
         echo '<div class="meta">' . $categoryLabel . ' · ' . h($post['author_name']) . ' · ' . h(format_date($post['published_at'] ?: date('Y-m-d'))) . '</div>';
         echo '<h2><a href="' . h(url('post.php?slug=' . rawurlencode($post['slug']))) . '">' . h($post['title']) . '</a></h2>';
-        echo '<p>' . h(mb_strimwidth(strip_tags($post['body']), 0, 240, '…')) . '</p></article>';
+        $excerpt = $post['excerpt'] !== '' ? $post['excerpt'] : mb_strimwidth(strip_tags($post['body']), 0, 240, '…');
+        echo '<p>' . h($excerpt) . '</p></article>';
     }
     echo '</div>';
     $pages = (int) ceil($count / $perPage);

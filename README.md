@@ -18,3 +18,16 @@ PHP 8 and MySQL blog CMS for `http://localhost/swd/07-php-blog/`.
 6. Visit `http://localhost/swd/07-php-blog/` and sign in at `/admin/login.php`.
 
 Set `APP_BASE_URL` if the project is mounted at a different URL path. The app expects MySQL with InnoDB and FULLTEXT support.
+
+## Admin content and cover uploads
+
+The admin area supports category and post CRUD. Post slugs are generated from titles and made unique with numeric suffixes. Cover uploads are limited to 2 MB and JPEG, PNG, and WebP.
+
+Upload protections:
+
+- The PHP upload error code and `is_uploaded_file()` check reject incomplete uploads and local files supplied in place of HTTP uploads.
+- The size is measured from the temporary file and capped at 2 MB, limiting oversized upload and storage exhaustion attempts.
+- `finfo` checks the file contents for an allowed MIME type instead of trusting the browser-supplied filename or content type, reducing extension/MIME spoofing.
+- `getimagesize()` verifies that the file parses as the image format reported by `finfo`, rejecting non-image files and mismatched or malformed image payloads.
+- A `bin2hex(random_bytes(16))` filename prevents attacker-controlled paths, filename collisions, and executable extensions from being used for stored uploads.
+- `move_uploaded_file()` only moves a verified PHP HTTP-upload temporary file into `uploads/`; the directory's `.htaccess` also blocks script execution there.

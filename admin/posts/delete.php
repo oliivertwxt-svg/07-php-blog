@@ -14,7 +14,13 @@ if (!$id) {
     http_response_code(400);
     exit('A valid post ID is required.');
 }
+$find = db()->prepare('SELECT cover_image FROM posts WHERE id = ?');
+$find->execute([$id]);
+$post = $find->fetch();
 $statement = db()->prepare('DELETE FROM posts WHERE id = ?');
 $statement->execute([$id]);
+if ($post) {
+    delete_cover_image($post['cover_image']);
+}
 flash('success', $statement->rowCount() ? 'Post deleted.' : 'Post was already deleted.');
 redirect('admin/posts/');
